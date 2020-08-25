@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import 'bootstrap/dist/css/bootstrap.css'
 import FileStorageService from '../service/FileStorageService'
+import FileDrawerComponent from './FileDrawerComponent'
 
 
-function UploadComponent(){
+function UploadComponent({setFileInfos}){
 
-    const [selectedFiles, setSelectedFiles] = useState(undefined);
-    const [currentFile, setCurrentFile] = useState(undefined);
-    const [progress, setProgress] = useState(0);
-    const [message, setMessage] = useState("");
+    
+    const [selectedFiles, setSelectedFiles] = useState(undefined)
+    const [currentFile, setCurrentFile] = useState(undefined)
+    const [progress, setProgress] = useState(0)
+    const [message, setMessage] = useState("")
+    
 
-    const [fileInfos, setFileInfos] = useState([]);
+    //alert state hook
+    const [alertVisible, setAlertVisible] = useState("hidden")
 
     const selectFile = (event) => {
         setSelectedFiles(event.target.files)
@@ -38,6 +42,7 @@ function UploadComponent(){
         })
 
         setSelectedFiles(undefined)
+        setAlertVisible("visible")
     }
 
     useEffect(() => {
@@ -46,9 +51,13 @@ function UploadComponent(){
         })
     }, [])
 
+    const setAlertVisibility = () => {
+        setAlertVisible("hidden")
+    }
+
     return(
         <div className="container" style={{margin: "auto", marginTop: "20px"}}>
-            <div className="card" style={{maxHeight: "30vh"}}>
+            <div className="card" style={{maxHeight: "30vh", minWidth: "70em",maxWidth: "70em"}}>
                 <div className="card-header">
                     <h3 class="card-title">UPLOAD FILES</h3>
                 </div>
@@ -61,7 +70,7 @@ function UploadComponent(){
                         Upload
                     </button>
                     {currentFile && (
-                        <div className="progress">
+                        <div className="progress" style={{visibility: alertVisible}}>
                             <div
                                 className="progress-bar progress-bar-info progress-bar-striped"
                                 role="progressbar"
@@ -73,29 +82,22 @@ function UploadComponent(){
                                 {progress}%
                             </div>
                         </div>
+                       
                      )}
+                      
                 </div>
+                
             </div>
 
-            <div className="alert alert-light" role="alert">
-                {message}
+            <div className="alert alert-dark" role="alert" onClick={setAlertVisibility} 
+            style={{visibility: alertVisible, minWidth: "70em",minHeight: "10vh", position: "absolute", zIndex: 1}}>
+                {message} <button 
+                className="btn btn-outline-danger" 
+                style={{float: "right"}}
+                onClick={setAlertVisibility}>x</button>
             </div>
+            
 
-            <div className="card" style={{minHeight: "50vh", maxHeight: "50vh"}}>
-                <div className="card-header">
-                    <h3 class="card-title">YOUR FILES</h3>
-                </div>
-                <div class="card-body" style={{overflow: "scroll"}}>
-                    <ul className="list-group list-group-flush">
-                        {fileInfos &&
-                            fileInfos.map((file, index) => (
-                            <li className="list-group-item" key={index}>
-                                <a href={file.url}>{file.name}</a>
-                            </li>
-                            ))}
-                    </ul>
-                </div>
-            </div>
         </div>
     )
 }
